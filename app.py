@@ -3,6 +3,9 @@ from flask_cors import CORS, cross_origin
 import psycopg2, json, requests, wikipediaapi, nltk
 from NLP_functions import tokenize, calc_idfs, sentence_match
 
+# nltk dependencies download
+nltk.download("punkt")
+nltk.download("stopwords")
 # Flask app setup
 app = Flask(__name__)
 cors = CORS(app)
