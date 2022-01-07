@@ -104,7 +104,7 @@ def wiki_search():
     id_count += 1
     # Saving the new ripped article values to the DB - add function for updating old articles later
     cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)",
-                (id_count, article, article_words, article_idfs))
+                (id_count, article, json.dumps(article_words), json.dumps(article_idfs)))
     conn.commit()
 
     """
