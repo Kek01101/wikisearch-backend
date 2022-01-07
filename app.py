@@ -35,11 +35,13 @@ def apicheck():
 @cross_origin()
 def dbcheck():
     # Checking that intended message is received, and that DB saving works
+    # Need to actually keep track of PK, id_count does this
+    id_count = 1
     test_json_1 = {"test": True, "type": 1}
     test_json_2 = {"test": "True", "type": 2}
     score = int(request.args.get("score", None))
-    print(score)
-    cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)", (1, score, json.dumps(test_json_1), json.dumps(test_json_2)))
+    id_count += 1
+    cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)", (id_count, score, json.dumps(test_json_1), json.dumps(test_json_2)))
     conn.commit()
     return jsonify({"msg": "Data saved to SQL database successfully"})
 
