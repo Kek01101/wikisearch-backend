@@ -17,10 +17,12 @@ def hello_world():
 def apicheck():
     # Checking that intended message is received
     msg = request.args.get("msg", None)
+    msg2 = request.args.get("msg2", None)
     print(f"Message is {msg}")
+    print(f"Message 2 is {msg2}")
 
     # Checking that sending responses works too
-    res = {"msg": f"Msg: {msg}"}
+    res = {"msg": f"Msg: {msg2}"}
     return jsonify(res)
 
 
