@@ -86,7 +86,8 @@ def wiki_search():
     NLP
     """
     # saving article tokens and idfs to an array for DB saving
-    article_info = [tokenize(article), calc_idfs(article)]
+    article_words = tokenize(article)
+    article_idfs = calc_idfs({article: article_words})
     # split document into a list of ordered tokens and save to sentence dict
     sentences = dict()
     for sentence in nltk.sent_tokenize(article):
@@ -103,7 +104,7 @@ def wiki_search():
     id_count += 1
     # Saving the new ripped article values to the DB - add function for updating old articles later
     cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)",
-                (id_count, article, article_info[0], article_info[1]))
+                (id_count, article, article_words, article_idfs))
     conn.commit()
 
     """
