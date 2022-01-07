@@ -3,3 +3,6 @@ gunicorn
 django-heroku
 Flask
 Flask-cors
+nltk
+requests
+wikipedia-api
