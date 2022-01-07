@@ -3,9 +3,6 @@ from flask_cors import CORS, cross_origin
 import psycopg2, json, requests, wikipediaapi, nltk
 from NLP_functions import tokenize, calc_idfs, sentence_match
 
-# nltk dependencies setup
-nltk.download("punkt")
-nltk.download("stopwords")
 # Flask app setup
 app = Flask(__name__)
 cors = CORS(app)
@@ -70,8 +67,8 @@ def wiki_search():
     subject = str(request.args.get("subject", None))
 
     # Formats and sends a request to the wikipedia API for 5 most-related pages to subject
-    query.replace(' ', "%20")
-    page_search = api_search.replace(placeholder, query)
+    subject.replace(' ', "%20")
+    page_search = api_search.replace(placeholder, subject)
     # Saves top 5 returned pages to top_pages list
     top_pages = requests.get(page_search).json()["query"]["search"]
 
