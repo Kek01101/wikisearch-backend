@@ -67,12 +67,16 @@ def sentence_match(query, sentences, word_scores, n=3):
         qtd = qtd/len(sentences[sentence])
         rankings.append(((sentence, qtd), score))
     rankings.sort(key=sortByScore, reverse=True)
+    """
     for a in range(n):
-        output.append(rankings[a][0])
+        output.append(rankings[a])
     # Fix this, this does not take into account IDF for best match
     output.sort(key=sortByScore, reverse=True)
     for a in range(n):
         output[n] = output[n][0]
+    """
+    for a in range(n):
+        output.append(rankings[a][0])
     return output
 
 
