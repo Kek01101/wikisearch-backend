@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-import psycopg2
+import psycopg2, json
 
 # Obligatory app setup
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def dbcheck():
     test_json_2 = {"test": "True", "type": 2}
     score = int(request.args.get("score", None))
     print(score)
-    cur.execute("INSERT INTO MAIN VALUES (%s, %s, %s)", (score, jsonify(test_json_1), jsonify(test_json_2)))
+    cur.execute("INSERT INTO MAIN VALUES (%s, %s, %s)", (score, json.dumps(test_json_1), json.dumps(test_json_2)))
     conn.commit()
     return jsonify({"msg": "Data saved to SQL database successfully"})
 
