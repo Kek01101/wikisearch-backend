@@ -76,7 +76,7 @@ def wiki_search():
     Wiki page sanitization
     """
     # Would normally ask user for preferred page, just pulls from the top page for now
-    p_wiki = wiki_wiki.page(top_pages["title"][0])
+    p_wiki = wiki_wiki.page(top_pages[0]["title"])
     article = str(p_wiki.text)
 
     """
