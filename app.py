@@ -6,7 +6,8 @@ import psycopg2
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-conn = psycopg2.connect("host=ec2-54-163-254-204.compute-1.amazonaws.com dbname=dpt2unfirlin7 user=gtktnnqqdhhtga")
+conn = psycopg2.connect("host=ec2-54-163-254-204.compute-1.amazonaws.com dbname=dpt2unfirlin7 user=gtktnnqqdhhtga"
+                        "password=eba958fc92598e3d580d84917af58f67488ea2c64d4af83ebfc096bd082bc532")
 cur = conn.cursor()
 
 
