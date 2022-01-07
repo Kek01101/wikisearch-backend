@@ -3,6 +3,7 @@ from flask_cors import CORS, cross_origin
 import psycopg2, json
 
 # Obligatory app setup
+id_count = 2
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -36,11 +37,11 @@ def apicheck():
 def dbcheck():
     # Checking that intended message is received, and that DB saving works
     # Need to actually keep track of PK, id_count does this
-    id_count = 1
+    global id_count
+    id_count += 1
     test_json_1 = {"test": True, "type": 1}
     test_json_2 = {"test": "True", "type": 2}
     score = int(request.args.get("score", None))
-    id_count += 1
     cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)", (id_count, score, json.dumps(test_json_1), json.dumps(test_json_2)))
     conn.commit()
     return jsonify({"msg": "Data saved to SQL database successfully"})
