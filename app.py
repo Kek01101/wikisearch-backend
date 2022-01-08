@@ -95,7 +95,9 @@ def wiki_search():
         if tokens:
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
+    print(sentences)
     word_score = calc_idfs(sentences)
+    print(word_score)
 
     """
     DB Hookup
