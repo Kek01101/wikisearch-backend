@@ -14,8 +14,6 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 conn = psycopg2.connect(host="ec2-54-163-254-204.compute-1.amazonaws.com", dbname="dpt2unfirlin7", user="gtktnnqqdhhtga",
                         password="eba958fc92598e3d580d84917af58f67488ea2c64d4af83ebfc096bd082bc532")
 cur = conn.cursor()
-# Database primary key variable setup
-id_count = 0
 # Wikipedia API link setup
 placeholder = "[PLACEHOLDER]"
 api_search = f"http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={placeholder}&srlimit=5&format=json"
@@ -51,8 +49,6 @@ def apicheck():
 def dbcheck():
     # Checking that intended message is received, and that DB saving works
     # Need to actually keep track of PK, id_count does this
-    global id_count
-    id_count += 1
     test_json_1 = {"test": True, "type": 1}
     test_json_2 = {"test": "True", "type": 2}
     score = str(request.args.get("score", None))
@@ -101,13 +97,14 @@ def wiki_search():
     """
     DB Hookup
     """
-    global id_count
-    id_count += 1
-    print(id_count)
+    with open("id_count.txt", "r") as file:
+        id_count = int(file.readline())
     # Saving the new ripped article values to the DB - add function for updating old articles later
     cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)",
                 (id_count, article, json.dumps(article_words), json.dumps(article_idfs)))
     conn.commit()
+    with open("id_count.txt", "w") as file:
+        file.write(str(id_count))
 
     """
     Query matching
