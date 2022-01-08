@@ -88,6 +88,7 @@ def wiki_search():
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     article_idfs = calc_idfs({article: article_words})
+    print(article_idfs)
     # split document into a list of ordered tokens and save to sentence dict
     sentences = dict()
     for sentence in nltk.sent_tokenize(article):
@@ -95,9 +96,7 @@ def wiki_search():
         if tokens:
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
-    print(sentences)
     word_score = calc_idfs(sentences)
-    print(word_score)
 
     """
     DB Hookup
