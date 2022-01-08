@@ -51,6 +51,8 @@ def sentence_match(query, sentences, word_scores, n=3):
     """
     Given a query, sentences, and the IDF values of the words in those sentences, provide the n best sentence
     matches for said query. If there is an IDF tie, the query term density will be used to settle the tie.
+
+    This somehow produces duplicates
     """
     def sortByScore(sList):
         return sList[1]
@@ -65,10 +67,10 @@ def sentence_match(query, sentences, word_scores, n=3):
                     score += word_scores[word]
                     qtd += 1
         qtd = qtd/len(sentences[sentence])
-        rankings.append((sentence, score, qtd))
+        rankings.append([sentence, score, qtd])
     rankings.sort(key=sortByScore, reverse=True)
     for a in range(n):
-        output.append((rankings[0], rankings[1]))
+        output.append(rankings[n][0])
     return output
 
 
