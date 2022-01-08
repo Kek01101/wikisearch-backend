@@ -87,6 +87,7 @@ def wiki_search():
     """
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
+    # take all articles from DB and use them to calculate article_idfs, then re-save
     article_idfs = calc_idfs({article: article_words})
     # split document into a list of ordered tokens and save to sentence dict
     sentences = dict()
