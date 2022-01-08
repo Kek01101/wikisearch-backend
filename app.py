@@ -111,6 +111,8 @@ def wiki_search():
     """
     Query matching
     """
+    # Tokenize the query so that matching can be performed
+    query = set(tokenize(str(query)))
     # Saving 3 most relevant sentences to the query to "top_sentences" array
     top_sentences = sentence_match(query, sentences, word_score)
 
