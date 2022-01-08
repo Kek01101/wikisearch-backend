@@ -65,7 +65,7 @@ def sentence_match(query, sentences, word_scores, n=3):
                     score += word_scores[word]
                     qtd += 1
         qtd = qtd/len(sentences[sentence])
-        rankings.append(sentence, score, qtd)
+        rankings.append((sentence, score, qtd))
     rankings.sort(key=sortByScore, reverse=True)
     print(rankings)
     raise NotImplementedError
