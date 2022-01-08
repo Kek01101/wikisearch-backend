@@ -103,6 +103,7 @@ def wiki_search():
     """
     global id_count
     id_count += 1
+    print(id_count)
     # Saving the new ripped article values to the DB - add function for updating old articles later
     cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)",
                 (id_count, article, json.dumps(article_words), json.dumps(article_idfs)))
@@ -120,7 +121,6 @@ def wiki_search():
     Placeholder response - for now
     """
     res = {
-        "article": article,
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2]
