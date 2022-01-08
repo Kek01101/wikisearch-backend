@@ -65,18 +65,12 @@ def sentence_match(query, sentences, word_scores, n=3):
                     score += word_scores[word]
                     qtd += 1
         qtd = qtd/len(sentences[sentence])
-        rankings.append(((sentence, qtd), score))
+        rankings.append(sentence, score, qtd)
     rankings.sort(key=sortByScore, reverse=True)
-    """
+    print(rankings)
+    raise NotImplementedError
     for a in range(n):
-        output.append(rankings[a])
-    # Fix this, this does not take into account IDF for best match
-    output.sort(key=sortByScore, reverse=True)
-    for a in range(n):
-        output[n] = output[n][0]
-    """
-    for a in range(n):
-        output.append(rankings[a][0])
+        output.append((rankings[0], rankings[1]))
     return output
 
 
