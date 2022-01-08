@@ -43,6 +43,7 @@ def calc_idfs(documents):
         for doc in documents:
             if word in documents[doc]:
                 count += 1
+        print(count)
         words[word] = log((len(documents))/count)
     return words
 
