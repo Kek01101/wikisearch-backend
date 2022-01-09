@@ -16,7 +16,7 @@ conn = psycopg2.connect(host="ec2-54-163-254-204.compute-1.amazonaws.com", dbnam
 cur = conn.cursor()
 # Wikipedia API link setup
 placeholder = "[PLACEHOLDER]"
-api_search = f"http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={placeholder}&srlimit=5&format=json"
+api_search = f"http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={placeholder}&srlimit=6&format=json"
 # Wikipedia API extraction setup
 wiki_wiki = wikipediaapi.Wikipedia(
     language='en',
@@ -75,7 +75,7 @@ def wikimatch():
     page_search = api_search.replace(placeholder, subject)
     # Saves top 5 returned pages to top_pages list
     top_pages = requests.get(page_search).json()["query"]["search"]
-    print(top_pages)
+    print(len(top_pages))
     # Formats response as JSON with 5 keys, each one representing a different term
     res = dict()
     for a in range(5):
