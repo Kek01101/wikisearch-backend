@@ -144,16 +144,22 @@ def wiki_search():
     top_sentences = sentence_match(query, sentences, word_score)
 
     """
-    Add citations to the JSON response as well
+    Sentences and associated citations are put into JSON form for response to frontend
     """
     res = {
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2],
-        "citation_1": citations[int(round(sentence_index.index(top_sentences[0])/len(sentences)*len(citations)))],
-        "citation_2": citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))],
-        "citation_3": citations[int(round(sentence_index.index(top_sentences[2]) / len(sentences) * len(citations)))]
     }
+    # Catchall for if there is only one citation
+    if len(citations) != 1:
+        res["citation_1"] = citations[int(round(sentence_index.index(top_sentences[0]) / len(sentences) * len(citations)))]
+        res["citation_2"] = citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))]
+        res["citation_3"] = citations[int(round(sentence_index.index(top_sentences[2]) / len(sentences) * len(citations)))]
+    else:
+        res["citation_1"] = citations[0]
+        res["citation_2"] = citations[0]
+        res["citation_3"] = citations[0]
     return jsonify(res)
 
 
