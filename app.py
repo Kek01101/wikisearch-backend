@@ -75,7 +75,6 @@ def wikimatch():
     page_search = api_search.replace(placeholder, subject)
     # Saves top 5 returned pages to top_pages list
     top_pages = requests.get(page_search).json()["query"]["search"]
-    print(len(top_pages))
     # Formats response as JSON with 5 keys, each one representing a different term
     res = dict()
     for a in range(5):
@@ -90,9 +89,10 @@ def wiki_search():
     Wiki page sanitization
     """
     query = str(request.args.get("query", None))
-    searchpage = str(request.args.get("page", None))
+    title = str(request.args.get("title", None))
+    print(title)
     # Would normally ask user for preferred page, just pulls from the top page for now
-    p_wiki = wiki_wiki.page(searchpage)
+    p_wiki = wiki_wiki.page(title)
     article = str(p_wiki.text)
 
     """
