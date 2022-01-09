@@ -112,7 +112,7 @@ def wiki_search():
     word_score = calc_idfs(sentences)
 
     """
-    DB Hookup
+    DB Hookup - maybe disable
     """
     with open("id_count.txt", "r") as file:
         id_count = int(file.readline())
