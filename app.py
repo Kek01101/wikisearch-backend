@@ -48,6 +48,7 @@ def apicheck():
 @cross_origin()
 def dbcheck():
     # Checking that intended message is received, and that DB saving works
+    id_count = 0
     # Need to actually keep track of PK, id_count does this
     test_json_1 = {"test": True, "type": 1}
     test_json_2 = {"test": "True", "type": 2}
@@ -58,11 +59,15 @@ def dbcheck():
     return jsonify({"msg": "Data saved to SQL database successfully"})
 
 
-@app.route('/wikisearch/', methods=['GET'])
+@app.route('/wikimatch/', methods=['GET'])
 @cross_origin()
-def wiki_search():
+def wikimatch():
+    """
+    This function handles searching wikipedia for the subject, and then returning 5 possible wiki pages to the user
+
+    First request to the backend should ONLY include the subject, query should be sent to main wiki_search function
+    """
     # Handles the actual wiki searching, handles all functionality using appropriate modules
-    query = str(request.args.get("query", None))
     subject = str(request.args.get("subject", None))
 
     # Formats and sends a request to the wikipedia API for 5 most-related pages to subject
@@ -70,12 +75,23 @@ def wiki_search():
     page_search = api_search.replace(placeholder, subject)
     # Saves top 5 returned pages to top_pages list
     top_pages = requests.get(page_search).json()["query"]["search"]
+    # Formats response as JSON with 5 keys, each one representing a different term
+    res = dict()
+    for a in range(5):
+        res[f"data{a}"] = top_pages[a]["title"]
+    return jsonify(res)
 
+
+@app.route('/wikisearch/', methods=['GET'])
+@cross_origin()
+def wiki_search():
     """
     Wiki page sanitization
     """
+    query = str(request.args.get("query", None))
+    searchpage = str(request.args.get("page", None))
     # Would normally ask user for preferred page, just pulls from the top page for now
-    p_wiki = wiki_wiki.page(top_pages[0]["title"])
+    p_wiki = wiki_wiki.page(searchpage)
     article = str(p_wiki.text)
 
     """
