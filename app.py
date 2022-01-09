@@ -133,7 +133,7 @@ def wiki_search():
     top_sentences = sentence_match(query, sentences, word_score)
 
     """
-    Placeholder response - for now
+    Add citations to the JSON response as well
     """
     res = {
         "sentence_1": top_sentences[0],
