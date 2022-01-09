@@ -75,6 +75,7 @@ def wikimatch():
     page_search = api_search.replace(placeholder, subject)
     # Saves top 5 returned pages to top_pages list
     top_pages = requests.get(page_search).json()["query"]["search"]
+    print(top_pages)
     # Formats response as JSON with 5 keys, each one representing a different term
     res = dict()
     for a in range(5):
