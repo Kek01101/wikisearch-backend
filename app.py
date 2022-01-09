@@ -100,9 +100,14 @@ def wiki_search():
     data = requests.get(citation_search).json()["parse"]["wikitext"]["*"]
     matches = re.findall(r'<ref>(.*?)</ref>', data)
     # URLs formatted and saved to "citations" array
-    citations = []
+    unclean_citations = []
     for match in matches:
-        citations.append(str(re.findall(r'\|url=(.*?)\|', match)).strip("[']"))
+        unclean_citations.append(str(re.findall(r'\|url=(.*?)\|', match)).strip("[']"))
+    # Cleaning up citations a bit more, and removing "empty" citations
+    citations = []
+    for citation in unclean_citations:
+        if citation != "":
+            citations.append(citation.strip(" "))
 
     """
     NLP
@@ -152,7 +157,6 @@ def wiki_search():
         "sentence_3": top_sentences[2],
     }
     # Catchall for if there is only one citation
-    print(citations)
     if len(citations) != 1:
         res["citation_1"] = citations[int(round(sentence_index.index(top_sentences[0]) / len(sentences) * len(citations)))]
         res["citation_2"] = citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))]
