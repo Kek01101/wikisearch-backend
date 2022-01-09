@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
-import psycopg2, json, requests, wikipediaapi, nltk
+import psycopg2, json, requests, wikipediaapi, nltk, re
 from NLP_functions import tokenize, calc_idfs, sentence_match
 
 # nltk dependencies download
@@ -17,6 +17,7 @@ cur = conn.cursor()
 # Wikipedia API link setup
 placeholder = "[PLACEHOLDER]"
 api_search = f"http://en.wikipedia.org/w/api.php?action=query&list=search&srsearch={placeholder}&srlimit=6&format=json"
+citation_pull = f"http://en.wikipedia.org/w/api.php?action=parse&page={placeholder}&prop=wikitext&format=json"
 # Wikipedia API extraction setup
 wiki_wiki = wikipediaapi.Wikipedia(
     language='en',
@@ -90,10 +91,18 @@ def wiki_search():
     """
     query = str(request.args.get("query", None))
     title = str(request.args.get("title", None))
-    print(title)
-    # Would normally ask user for preferred page, just pulls from the top page for now
+    # Pulls the desired article text using wikipedia-api library
     p_wiki = wiki_wiki.page(title)
     article = str(p_wiki.text)
+    # Manually pulls all citations from a wikipedia page using regex
+    title.replace(' ', "%20")
+    citation_search = citation_pull.replace(placeholder, title)
+    data = requests.get(citation_search).json()["parse"]["wikitext"]["*"]
+    matches = re.findall(r'<ref>(.*?)</ref>', data)
+    # URLs formatted and saved to "citations" array
+    citations = []
+    for match in matches:
+        citations.append(str(re.findall(r'\|url=(.*?)\|', match)).strip("[']"))
 
     """
     NLP
@@ -102,17 +111,19 @@ def wiki_search():
     article_words = tokenize(article)
     # take all articles from DB and use them to calculate article_idfs, then re-save
     article_idfs = calc_idfs({article: article_words})
-    # split document into a list of ordered tokens and save to sentence dict
+    # split document into a list of ordered tokens and save to sentence dict, and also sentence_index array
+    sentence_index = []
     sentences = dict()
     for sentence in nltk.sent_tokenize(article):
         tokens = tokenize(sentence)
         if tokens:
+            sentence_index.append(sentence)
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
     word_score = calc_idfs(sentences)
 
     """
-    DB Hookup - maybe disable
+    DB Hookup
     """
     with open("id_count.txt", "r") as file:
         id_count = int(file.readline())
@@ -138,7 +149,10 @@ def wiki_search():
     res = {
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
-        "sentence_3": top_sentences[2]
+        "sentence_3": top_sentences[2],
+        "citation_1": citations[int(round(sentence_index.index(top_sentences[0])/len(sentences)*len(citations)))],
+        "citation_2": citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))],
+        "citation_3": citations[int(round(sentence_index.index(top_sentences[2]) / len(sentences) * len(citations)))]
     }
     return jsonify(res)
 
