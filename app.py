@@ -112,10 +112,18 @@ def wiki_search():
     """
     NLP
     """
+    # taking all articles from DB in order to calculate article_idfs
+    rows = cur.execute('SELECT * FROM main;').fetchall()
+    articles = dict()
+    article_ids = dict()
+    for row in rows:
+        articles[row[1]] = row[2]
+        article_ids[row[3]] = row[0]
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
-    # take all articles from DB and use them to calculate article_idfs, then re-save
-    article_idfs = calc_idfs({article: article_words})
+    articles[article] = article_words
+    # take all articles from DB and use them to calculate article_idfs
+    article_idfs = calc_idfs(articles)
     # split document into a list of ordered tokens and save to sentence dict, and also sentence_index array
     sentence_index = []
     sentences = dict()
@@ -128,17 +136,17 @@ def wiki_search():
     word_score = calc_idfs(sentences)
 
     """
-    DB Hookup
+    Saving new data to database - will update old data if page already present
     """
-    with open("id_count.txt", "r") as file:
-        id_count = int(file.readline())
-    id_count += 1
+    id_count = len(articles)
     # Saving the new ripped article values to the DB - add function for updating old articles later
-    cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s)",
-                (id_count, article, json.dumps(article_words), json.dumps(article_idfs)))
+    if article_ids[title]:
+        cur.execute(f"UPDATE main SET article = {article}, "
+                    f"tokens = {json.dumps(article_words)} WHERE id = {article_ids[title]};")
+    else:
+        cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s);",
+                    (id_count, article, json.dumps(article_words), title))
     conn.commit()
-    with open("id_count.txt", "w") as file:
-        file.write(str(id_count))
 
     """
     Query matching
