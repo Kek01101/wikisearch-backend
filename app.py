@@ -145,7 +145,7 @@ def wiki_search():
     try:
         article_ids[title]
         cur.execute(f"UPDATE main SET article = (%s), tokens = (%s) WHERE id = (%s);",
-                    (article, article_words, article_ids[title]))
+                    (article, json.dumps(article_words), article_ids[title]))
     except KeyError:
         cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s);",
                     (id_count, article, json.dumps(article_words), title))
