@@ -116,8 +116,10 @@ def wiki_search():
     articles = dict()
     article_ids = dict()
     rows = cur.execute('SELECT * FROM main;')
+    print(rows)
     if rows is not None:
         rows = rows.fetchall()
+        print(rows)
         for row in rows:
             articles[row[1]] = row[2]
             article_ids[row[3]] = row[0]
