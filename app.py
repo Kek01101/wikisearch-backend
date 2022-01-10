@@ -113,7 +113,9 @@ def wiki_search():
     NLP
     """
     # taking all articles from DB in order to calculate article_idfs
-    rows = cur.execute('SELECT * FROM main;').fetchall()
+    rows = cur.execute('SELECT * FROM main;')
+    if rows is not None:
+        rows = rows.fetchall()
     articles = dict()
     article_ids = dict()
     for row in rows:
