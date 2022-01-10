@@ -167,8 +167,8 @@ def wiki_search():
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2],
     }
-    # Catchall for if there is only one citation
-    if len(citations) != 1:
+    # Catchall for if there is only one, or if there are no citations
+    if len(citations) != 1 and len(citations) != 0:
         res["citation_1"] = citations[int(round(sentence_index.index(top_sentences[0]) / len(sentences) * len(citations)))]
         res["citation_2"] = citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))]
         res["citation_3"] = citations[int(round(sentence_index.index(top_sentences[2]) / len(sentences) * len(citations)))]
