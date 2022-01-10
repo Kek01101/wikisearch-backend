@@ -142,10 +142,11 @@ def wiki_search():
     """
     id_count = len(articles)
     # Saving the new ripped article values to the DB - add function for updating old articles later
-    if article_ids[title]:
+    try:
+        article_ids[title]
         cur.execute(f"UPDATE main SET article = {article}, "
                     f"tokens = {json.dumps(article_words)} WHERE id = {article_ids[title]};")
-    else:
+    except KeyError:
         cur.execute("INSERT INTO main VALUES (%s, %s, %s, %s);",
                     (id_count, article, json.dumps(article_words), title))
     conn.commit()
