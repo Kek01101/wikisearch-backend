@@ -115,11 +115,9 @@ def wiki_search():
     # taking all articles from DB in order to calculate article_idfs
     articles = dict()
     article_ids = dict()
-    rows = cur.execute('SELECT * FROM main;')
-    print(rows)
+    cur.execute('SELECT * FROM main;')
+    rows = cur.fetchall()
     if rows is not None:
-        rows = rows.fetchall()
-        print(rows)
         for row in rows:
             articles[row[1]] = row[2]
             article_ids[row[3]] = row[0]
@@ -145,8 +143,6 @@ def wiki_search():
     id_count = len(articles)
     # Saving the new ripped article values to the DB - add function for updating old articles later
     try:
-        print(article_ids)
-        print(title)
         article_ids[title]
         cur.execute(f"UPDATE main SET article = {article}, "
                     f"tokens = {json.dumps(article_words)} WHERE id = {article_ids[title]};")
