@@ -113,14 +113,14 @@ def wiki_search():
     NLP
     """
     # taking all articles from DB in order to calculate article_idfs
+    articles = dict()
+    article_ids = dict()
     rows = cur.execute('SELECT * FROM main;')
     if rows is not None:
         rows = rows.fetchall()
-    articles = dict()
-    article_ids = dict()
-    for row in rows:
-        articles[row[1]] = row[2]
-        article_ids[row[3]] = row[0]
+        for row in rows:
+            articles[row[1]] = row[2]
+            article_ids[row[3]] = row[0]
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     articles[article] = article_words
