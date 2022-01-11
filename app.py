@@ -166,6 +166,7 @@ def wiki_search():
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2],
+        "url": str(p_wiki.fullurl())
     }
     # Catchall for if there is only one, or if there are no citations
     if len(citations) != 1 and len(citations) != 0:
