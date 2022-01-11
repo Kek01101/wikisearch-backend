@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 import psycopg2, json, requests, wikipediaapi, nltk, re
-from NLP_functions import tokenize, calc_idfs, sentence_match
+from NLP_functions import tokenize, calc_idfs, sentence_match, article_match
 
 # nltk dependencies download
 nltk.download("punkt")
@@ -158,6 +158,18 @@ def wiki_search():
     query = set(tokenize(str(query)))
     # Saving 3 most relevant sentences to the query to "top_sentences" array
     top_sentences = sentence_match(query, sentences, word_score)
+    # matching queries to articles to find if there are any more-relevant articles
+    top_articles = article_match(query, articles, article_idfs)
+    # pre-emptive debugger
+    print(top_articles[0])
+    # sending better articles to frontend if they exist
+    article_1 = ""
+    article_2 = ""
+    if article != top_articles[0] and article != top_articles[1]:
+        article_1 = top_articles[0]
+        article_2 = top_articles[1]
+    elif article != top_articles[1]:
+        article_1 = top_articles[0]
 
     """
     Sentences and associated citations are put into JSON form for response to frontend
@@ -166,7 +178,9 @@ def wiki_search():
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2],
-        "url": str(p_wiki.fullurl)
+        "url": str(p_wiki.fullurl),
+        "article_1": article_1,
+        "article_2": article_2
     }
     # Catchall for if there is only one, or if there are no citations
     if len(citations) != 1 and len(citations) != 0:
