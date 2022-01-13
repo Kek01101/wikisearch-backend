@@ -201,7 +201,7 @@ def wiki_search():
         res["citation_3"] = "There are no citations for non-sentences"
     if res["sentence_2"] == "":
         res["sentence_2"] = "Sorry, no more sentences were found in this document"
-        res["citation_3"] = "There are no citations for non-sentences"
+        res["citation_2"] = "There are no citations for non-sentences"
 
     # Response is returned to frontend in JSON form
     return jsonify(res)
