@@ -70,7 +70,10 @@ def sentence_match(query, sentences, word_scores, n=3):
         rankings.append([sentence, score, qtd])
     rankings.sort(key=sortByScore, reverse=True)
     for a in range(n):
-        output.append(rankings[a][0])
+        try:
+            output.append(rankings[a][0])
+        except:
+            output.append("")
     return output
 
 

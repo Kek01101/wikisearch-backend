@@ -195,6 +195,15 @@ def wiki_search():
         res["citation_1"] = citations[0]
         res["citation_2"] = citations[0]
         res["citation_3"] = citations[0]
+    # If articles are so short they only contain one or two sentences, an appropriate message is returned
+    if res["sentence_3"] == "":
+        res["sentence_3"] = "Sorry, no more sentences were found in this document"
+        res["citation_3"] = "There are no citations for non-sentences"
+    if res["sentence_2"] == "":
+        res["sentence_2"] = "Sorry, no more sentences were found in this document"
+        res["citation_3"] = "There are no citations for non-sentences"
+
+    # Response is returned to frontend in JSON form
     return jsonify(res)
 
 
