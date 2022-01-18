@@ -180,10 +180,13 @@ def wiki_search():
         "sentence_3": top_sentences[2],
         "url": str(p_wiki.fullurl),
         "article_1": article_1,
-        "article_1_title": article_titles[article_1],
-        "article_2": article_2,
-        "article_2_title": article_titles[article_2]
+        "article_2": article_2
     }
+    # If better articles exist, send the titles of said articles to the frontend as well
+    if article_1 != "":
+        res["article_1_title"] = article_titles[article_1]
+    if article_2 != "":
+        res["article_2_title"] = article_titles[article_2]
     # catchall for if there is only one, or if there are no citations
     # citations assigned based upon sentence position in wikipedia article - not perfect, but the best solution I found
     if len(citations) != 1 and len(citations) != 0:
