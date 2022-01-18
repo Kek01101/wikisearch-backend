@@ -114,12 +114,14 @@ def wiki_search():
     """
     # taking all articles from DB in order to calculate article_idfs
     articles = dict()
+    article_titles = dict()
     article_ids = dict()
     cur.execute('SELECT * FROM main;')
     rows = cur.fetchall()
     if rows is not None:
         for row in rows:
             articles[row[1]] = row[2]
+            article_titles[row[1]] = row[3]
             article_ids[row[3]] = row[0]
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
@@ -160,15 +162,13 @@ def wiki_search():
     top_sentences = sentence_match(query, sentences, word_score)
     # matching queries to articles to find if there are any more-relevant articles
     top_articles = article_match(query, articles, article_idfs)
-    # pre-emptive debugger
-    print(top_articles[0])
     # sending better articles to frontend if they exist
     article_1 = ""
     article_2 = ""
     if article != top_articles[0] and article != top_articles[1]:
         article_1 = top_articles[0]
         article_2 = top_articles[1]
-    elif article != top_articles[1]:
+    elif article != top_articles[0]:
         article_1 = top_articles[0]
 
     """
@@ -180,9 +180,12 @@ def wiki_search():
         "sentence_3": top_sentences[2],
         "url": str(p_wiki.fullurl),
         "article_1": article_1,
-        "article_2": article_2
+        "article_1_title": article_titles[article_1],
+        "article_2": article_2,
+        "article_2_title": article_titles[article_2]
     }
-    # Catchall for if there is only one, or if there are no citations
+    # catchall for if there is only one, or if there are no citations
+    # citations assigned based upon sentence position in wikipedia article - not perfect, but the best solution I found
     if len(citations) != 1 and len(citations) != 0:
         res["citation_1"] = citations[int(round(sentence_index.index(top_sentences[0]) / len(sentences) * len(citations)))]
         res["citation_2"] = citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))]
