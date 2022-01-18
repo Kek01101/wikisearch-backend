@@ -178,9 +178,7 @@ def wiki_search():
         "sentence_1": top_sentences[0],
         "sentence_2": top_sentences[1],
         "sentence_3": top_sentences[2],
-        "url": str(p_wiki.fullurl),
-        "article_1": article_1,
-        "article_2": article_2
+        "url": str(p_wiki.fullurl)
     }
     # If better articles exist, send the titles of said articles to the frontend as well
     if article_1 != "":
