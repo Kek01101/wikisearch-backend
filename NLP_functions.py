@@ -34,10 +34,12 @@ def calc_idfs(documents):
     """
     words = dict()
     clearlist = []
+    # Adds all unique words to list "clearlist"
     for doc in documents:
         for word in documents[doc]:
             if word not in clearlist:
                 clearlist.append(word)
+    # For each unique word, count instances in document to calcualte idf score
     for word in clearlist:
         count = 0
         for doc in documents:
@@ -52,12 +54,15 @@ def sentence_match(query, sentences, word_scores, n=3):
     Given a query, sentences, and the IDF values of the words in those sentences, provide the n best sentence
     matches for said query. If there is an IDF tie, the query term density will be used to settle the tie.
 
-    This somehow produces duplicates
+    QTD tie still needs to be implemented
     """
+    # This functions sorts a list of sets based upon the second item in the set
     def sortByScore(sList):
         return sList[1]
+    # Rankings list is for working with the data - output is for output
     rankings = []
     output = []
+    # Loops through every sentence and adds points for words based on idf score
     for sentence in sentences:
         score = 0
         qtd = 0
@@ -85,10 +90,13 @@ def article_match(query, articles, article_scores, n=2):
     Full TF-IDF is used here, whereas only IDF is used for the actual sentence matching. This is because this considers
     many documents, and sentence match only considers one at a time.
     """
+    # This functions sorts a list of sets based upon the second item in the set
     def sortByScore(sList):
         return sList[1]
+    # Rankings list is for working with the data - output is for output
     rankings = []
     output = []
+    # Loops through every article, and adds points to word score for each word in the articles tf-idf score
     for article in articles:
         articles[article] = Counter(articles[article]).most_common()
         score = 0
@@ -97,7 +105,9 @@ def article_match(query, articles, article_scores, n=2):
                 if word == term:
                     score += float(frequency)*article_scores[term]
         rankings.append((article, score))
+    # Articles sorted by score
     rankings.sort(key=sortByScore, reverse=True)
+    # Top 2 articles outputted
     for a in range(n):
         output.append(rankings[a][0])
     return output

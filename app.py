@@ -28,12 +28,16 @@ wiki_wiki = wikipediaapi.Wikipedia(
 @app.route('/')
 @cross_origin()
 def hello_world():
+    # Simply ensures the app is running
     return 'CORS test'
 
 
 @app.route('/api-test/', methods=['GET'])
 @cross_origin()
 def apicheck():
+    """
+    Api test to ensure message forwarding is working - IGNORE
+    """
     # Checking that intended message is received
     msg = request.args.get("msg", None)
     msg2 = request.args.get("msg2", None)
@@ -48,6 +52,9 @@ def apicheck():
 @app.route('/db-test/', methods=['GET'])
 @cross_origin()
 def dbcheck():
+    """
+    DB test to ensure databse can receive data - IGNORE
+    """
     # Checking that intended message is received, and that DB saving works
     id_count = 0
     # Need to actually keep track of PK, id_count does this
@@ -67,6 +74,8 @@ def wikimatch():
     This function handles searching wikipedia for the subject, and then returning 5 possible wiki pages to the user
 
     First request to the backend should ONLY include the subject, query should be sent to main wiki_search function
+
+    This is the implementation of the subject selection in Flowchart 1
     """
     # Handles the actual wiki searching, handles all functionality using appropriate modules
     subject = str(request.args.get("subject", None))
@@ -87,7 +96,7 @@ def wikimatch():
 @cross_origin()
 def wiki_search():
     """
-    Wiki page sanitization
+    Flowchart 2: Wikipedia text handling
     """
     query = str(request.args.get("query", None))
     title = str(request.args.get("title", None))
@@ -109,11 +118,27 @@ def wiki_search():
         if citation != "":
             citations.append(citation.strip(" "))
 
+
     """
-    NLP
+    Flowchart 3: Natural language processing
     """
+    # split document into a list of ordered tokens and save to sentence dict, and also sentence_index array
+    sentence_index = []
+    sentences = dict()
+    for sentence in nltk.sent_tokenize(article):
+        tokens = tokenize(sentence)
+        if tokens:
+            sentence_index.append(sentence)
+            sentences[sentence] = tokens
+    # calculate IDF values for each sentence and save to word_score dict
+    word_score = calc_idfs(sentences)
     # taking all articles from DB in order to calculate article_idfs
     articles = dict()
+    """
+    !! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
+    article_titles is a mapping of article text to the title of the articles
+    article_ids is a mapping of article title to article database ID
+    """
     article_titles = dict()
     article_ids = dict()
     cur.execute('SELECT * FROM main;')
@@ -128,22 +153,12 @@ def wiki_search():
     articles[article] = article_words
     # take all articles from DB and use them to calculate article_idfs
     article_idfs = calc_idfs(articles)
-    # split document into a list of ordered tokens and save to sentence dict, and also sentence_index array
-    sentence_index = []
-    sentences = dict()
-    for sentence in nltk.sent_tokenize(article):
-        tokens = tokenize(sentence)
-        if tokens:
-            sentence_index.append(sentence)
-            sentences[sentence] = tokens
-    # calculate IDF values for each sentence and save to word_score dict
-    word_score = calc_idfs(sentences)
 
     """
-    Saving new data to database - will update old data if page already present
+    Flowchart 3 Cont: Saving data to database
     """
     id_count = len(articles)
-    # Saving the new ripped article values to the DB - add function for updating old articles later
+    # Saving the new ripped article values to the DB - updates the database instead if article already present
     try:
         article_ids[title]
         cur.execute(f"UPDATE main SET article = (%s), tokens = (%s) WHERE id = (%s);",
@@ -154,25 +169,20 @@ def wiki_search():
     conn.commit()
 
     """
-    Query matching
+    Flowchart 4: Query matching
     """
     # Tokenize the query so that matching can be performed
     query = set(tokenize(str(query)))
     # Saving 3 most relevant sentences to the query to "top_sentences" array
     top_sentences = sentence_match(query, sentences, word_score)
-    # matching queries to articles to find if there are any more-relevant articles
+    # matching queries to articles to find if there are any more-relevant articles - saving 3 most relevant to array
     top_articles = article_match(query, articles, article_idfs)
-    # sending better articles to frontend if they exist
-    article_1 = ""
-    article_2 = ""
-    if article != top_articles[0] and article != top_articles[1]:
-        article_1 = top_articles[0]
-        article_2 = top_articles[1]
-    elif article != top_articles[0]:
-        article_1 = top_articles[0]
 
     """
-    Sentences and associated citations are put into JSON form for response to frontend
+    Flowchart 5: Citation matching and better article suggestion
+    
+    Since citations are matched and saved directly into a JSON response, the preamble of the JSON response is formatted
+    before the citations are matched
     """
     res = {
         "sentence_1": top_sentences[0],
@@ -180,7 +190,14 @@ def wiki_search():
         "sentence_3": top_sentences[2],
         "url": str(p_wiki.fullurl)
     }
-    # If better articles exist, send the titles of said articles to the frontend as well
+    # If better articles exist, send the titles of said articles to the frontend
+    article_1 = ""
+    article_2 = ""
+    if article != top_articles[0] and article != top_articles[1]:
+        article_1 = top_articles[0]
+        article_2 = top_articles[1]
+    elif article != top_articles[0]:
+        article_1 = top_articles[0]
     if article_1 != "":
         res["article_1_title"] = article_titles[article_1]
     else:
@@ -189,21 +206,22 @@ def wiki_search():
         res["article_2_title"] = article_titles[article_2]
     else:
         res["article_2_title"] = ""
-    # catchall for if there is only one, or if there are no citations
     # citations assigned based upon sentence position in wikipedia article - not perfect, but the best solution I found
     if len(citations) != 1 and len(citations) != 0:
         res["citation_1"] = citations[int(round(sentence_index.index(top_sentences[0]) / len(sentences) * len(citations)))]
         res["citation_2"] = citations[int(round(sentence_index.index(top_sentences[1]) / len(sentences) * len(citations)))]
         res["citation_3"] = citations[int(round(sentence_index.index(top_sentences[2]) / len(sentences) * len(citations)))]
     elif len(citations) == 0:
+        # If no citations, user is informed when they click for the citation
         res["citation_1"] = "Sorry, no citations were found!"
         res["citation_2"] = "Sorry, no citations were found!"
         res["citation_3"] = "Sorry, no citations were found!"
     else:
+        # If one citation is found, it is matched to the entire article
         res["citation_1"] = citations[0]
         res["citation_2"] = citations[0]
         res["citation_3"] = citations[0]
-    # If articles are so short they only contain one or two sentences, an appropriate message is returned
+    # If articles are so short that they only contain one or two sentences, an appropriate message is returned
     if res["sentence_3"] == "":
         res["sentence_3"] = "Sorry, no more sentences were found in this document"
         res["citation_3"] = "There are no citations for non-sentences"
