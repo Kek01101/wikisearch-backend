@@ -163,8 +163,7 @@ def wiki_search():
     """
     Flowchart 3 Cont: Saving data to database
     """
-    id_count = len(articles)
-    print(id_count)
+    id_count = len(articles) + 1
     # Saving the new ripped article values to the DB - updates the database instead if article already present
     try:
         article_ids[title]
