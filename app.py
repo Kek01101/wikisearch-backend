@@ -8,7 +8,7 @@ nltk.download("punkt")
 nltk.download("stopwords")
 # Flask app setup
 app = Flask(__name__)
-cors = CORS(app)
+CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 # Database connection setup
 conn = psycopg2.connect(host="ec2-54-163-254-204.compute-1.amazonaws.com", dbname="dpt2unfirlin7", user="gtktnnqqdhhtga",
