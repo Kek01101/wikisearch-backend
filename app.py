@@ -152,13 +152,19 @@ def wiki_search():
             sentence_index.append(sentence)
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
+    start = time.time()
     word_score = calc_idfs(sentences)
+    end = time.time()
+    print(end - start)
 
     # loading global article data previously loaded from DB
+    start = time.time()
     global articles
     global article_ids
     global article_titles
     global id_count
+    end = time.time()
+    print(end - start)
 
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
