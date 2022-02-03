@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 import psycopg2, json, requests, wikipediaapi, nltk, re
 from NLP_functions import tokenize, calc_idfs, sentence_match, article_match
+import time
 
 # nltk dependencies download
 nltk.download("punkt")
@@ -162,8 +163,11 @@ def wiki_search():
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     articles[article] = article_words
+    start = time.time()
     # take all articles from DB and use them to calculate article_idfs
     article_idfs = calc_idfs(articles)
+    end = time.time()
+    print(end-start)
 
     """
     Flowchart 3 Cont: Saving data to database
