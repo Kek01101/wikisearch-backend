@@ -39,7 +39,7 @@ def calc_idfs(documents):
         for word in documents[doc]:
             if word not in clearlist:
                 clearlist.append(word)
-    # For each unique word, count instances in document to calcualte idf score
+    # For each unique word, count instances in document to calculate idf score
     for word in clearlist:
         count = 0
         for doc in documents:

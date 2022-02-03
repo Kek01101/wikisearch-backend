@@ -229,6 +229,8 @@ def wiki_search():
         res["sentence_2"] = "Sorry, no more sentences were found in this document"
         res["citation_2"] = "There are no citations for non-sentences"
 
+    # A CORS headers is added so that the receiver does not automatically deny response
+    re.headers.add('Access-Control-Allow-Origin', '*')
     # Response is returned to frontend in JSON form
     return jsonify(res)
 
