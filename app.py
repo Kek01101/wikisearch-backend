@@ -24,6 +24,26 @@ wiki_wiki = wikipediaapi.Wikipedia(
     extract_format=wikipediaapi.ExtractFormat.WIKI
 )
 
+# Importing articles from database for use with NLP
+print("[SETUP]: Starting database loading")
+articles = dict()
+"""
+!! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
+article_titles is a mapping of article text to the title of the articles
+article_ids is a mapping of article title to article database ID
+"""
+article_titles = dict()
+article_ids = dict()
+cur.execute('SELECT * FROM main;')
+rows = cur.fetchall()
+if rows is not None:
+    for row in rows:
+        articles[row[1]] = row[2]
+        article_titles[row[1]] = row[3]
+        article_ids[row[3]] = row[0]
+id_count = len(articles)
+print("[SETUP]: Database loading complete")
+
 
 @app.route('/')
 @cross_origin()
@@ -132,22 +152,13 @@ def wiki_search():
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
     word_score = calc_idfs(sentences)
-    # taking all articles from DB in order to calculate article_idfs
-    articles = dict()
-    """
-    !! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
-    article_titles is a mapping of article text to the title of the articles
-    article_ids is a mapping of article title to article database ID
-    """
-    article_titles = dict()
-    article_ids = dict()
-    cur.execute('SELECT * FROM main;')
-    rows = cur.fetchall()
-    if rows is not None:
-        for row in rows:
-            articles[row[1]] = row[2]
-            article_titles[row[1]] = row[3]
-            article_ids[row[3]] = row[0]
+
+    # loading global article data previously loaded from DB
+    global articles
+    global article_ids
+    global article_titles
+    global id_count
+
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     articles[article] = article_words
@@ -229,15 +240,8 @@ def wiki_search():
         res["sentence_2"] = "Sorry, no more sentences were found in this document"
         res["citation_2"] = "There are no citations for non-sentences"
 
-    # Response is converted to JSON form
-    res = jsonify(res)
-    # A CORS headers is added so that the receiver does not automatically deny response
-    try:
-        res.headers['Access-Control-Allow-Origin']
-    except KeyError:
-        res.headers.add('Access-Control-Allow-Origin', '*')
     # Response is returned to frontend in JSON form
-    return res
+    return jsonify(res)
 
 
 if __name__ == '__main__':
