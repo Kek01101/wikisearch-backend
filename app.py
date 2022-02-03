@@ -25,26 +25,6 @@ wiki_wiki = wikipediaapi.Wikipedia(
     extract_format=wikipediaapi.ExtractFormat.WIKI
 )
 
-# Importing articles from database for use with NLP
-print("[SETUP]: Starting database loading")
-articles = dict()
-"""
-!! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
-article_titles is a mapping of article text to the title of the articles
-article_ids is a mapping of article title to article database ID
-"""
-article_titles = dict()
-article_ids = dict()
-cur.execute('SELECT * FROM main;')
-rows = cur.fetchall()
-if rows is not None:
-    for row in rows:
-        articles[row[1]] = row[2]
-        article_titles[row[1]] = row[3]
-        article_ids[row[3]] = row[0]
-id_count = len(articles)
-print("[SETUP]: Database loading complete")
-
 
 @app.route('/')
 @cross_origin()
@@ -155,10 +135,25 @@ def wiki_search():
     word_score = calc_idfs(sentences)
 
     # loading global article data previously loaded from DB
-    global articles
-    global article_ids
-    global article_titles
-    global id_count
+    # Importing articles from database for use with NLP
+    print("[SETUP]: Starting database loading")
+    articles = dict()
+    """
+    !! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
+    article_titles is a mapping of article text to the title of the articles
+    article_ids is a mapping of article title to article database ID
+    """
+    article_titles = dict()
+    article_ids = dict()
+    cur.execute('SELECT * FROM main;')
+    rows = cur.fetchall()
+    if rows is not None:
+        for row in rows:
+            articles[row[1]] = row[2]
+            article_titles[row[1]] = row[3]
+            article_ids[row[3]] = row[0]
+    id_count = len(articles)
+    print("[SETUP]: Database loading complete")
 
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
