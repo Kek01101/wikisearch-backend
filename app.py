@@ -232,7 +232,10 @@ def wiki_search():
     # Response is converted to JSON form
     res = jsonify(res)
     # A CORS headers is added so that the receiver does not automatically deny response
-    # res.headers.add('Access-Control-Allow-Origin', '*')
+    try:
+        res.headers['Access-Control-Allow-Origin']
+    except KeyError:
+        res.headers.add('Access-Control-Allow-Origin', '*')
     # Response is returned to frontend in JSON form
     return res
 
