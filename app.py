@@ -152,28 +152,19 @@ def wiki_search():
             sentence_index.append(sentence)
             sentences[sentence] = tokens
     # calculate IDF values for each sentence and save to word_score dict
-    start = time.time()
     word_score = calc_idfs(sentences)
-    end = time.time()
-    print(end - start)
 
     # loading global article data previously loaded from DB
-    start = time.time()
     global articles
     global article_ids
     global article_titles
     global id_count
-    end = time.time()
-    print(end - start)
 
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     articles[article] = article_words
-    start = time.time()
     # take all articles from DB and use them to calculate article_idfs
-    article_idfs = calc_idfs(articles)
-    end = time.time()
-    print(end-start)
+    # article_idfs = calc_idfs(articles)
 
     """
     Flowchart 3 Cont: Saving data to database
@@ -197,7 +188,8 @@ def wiki_search():
     # Saving 3 most relevant sentences to the query to "top_sentences" array
     top_sentences = sentence_match(query, sentences, word_score)
     # matching queries to articles to find if there are any more-relevant articles - saving 3 most relevant to array
-    top_articles = article_match(query, articles, article_idfs)
+    # top_articles = article_match(query, articles, article_idfs)
+    top_articles = [article, None]
 
     """
     Flowchart 5: Citation matching and better article suggestion
