@@ -152,7 +152,6 @@ def wiki_search():
             articles[row[1]] = row[2]
             article_titles[row[1]] = row[3]
             article_ids[row[3]] = row[0]
-    id_count = len(articles)
     print("[SETUP]: Database loading complete")
 
     # saving article tokens and idfs to an array for DB saving
