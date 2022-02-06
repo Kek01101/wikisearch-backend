@@ -136,7 +136,6 @@ def wiki_search():
 
     # loading global article data previously loaded from DB
     # Importing articles from database for use with NLP
-    print("[SETUP]: Starting database loading")
     articles = dict()
     """
     !! - article titles and ids dicts not in flowchart, but used to easily pass data to frontend
@@ -152,13 +151,12 @@ def wiki_search():
             articles[row[1]] = row[2]
             article_titles[row[1]] = row[3]
             article_ids[row[3]] = row[0]
-    print("[SETUP]: Database loading complete")
 
     # saving article tokens and idfs to an array for DB saving
     article_words = tokenize(article)
     articles[article] = article_words
     # take all articles from DB and use them to calculate article_idfs
-    # article_idfs = calc_idfs(articles)
+    article_idfs = calc_idfs(articles)
 
     """
     Flowchart 3 Cont: Saving data to database
@@ -182,8 +180,7 @@ def wiki_search():
     # Saving 3 most relevant sentences to the query to "top_sentences" array
     top_sentences = sentence_match(query, sentences, word_score)
     # matching queries to articles to find if there are any more-relevant articles - saving 3 most relevant to array
-    # top_articles = article_match(query, articles, article_idfs)
-    top_articles = [article, None]
+    top_articles = article_match(query, articles, article_idfs)
 
     """
     Flowchart 5: Citation matching and better article suggestion

@@ -104,7 +104,7 @@ def article_match(query, articles, article_scores, n=2):
             for term, frequency in articles[article]:
                 if word == term:
                     score += float(frequency)*article_scores[term]
-        rankings.append((article, score))
+        rankings.append([article, score])
     # Articles sorted by score
     rankings.sort(key=sortByScore, reverse=True)
     # Top 2 articles outputted
